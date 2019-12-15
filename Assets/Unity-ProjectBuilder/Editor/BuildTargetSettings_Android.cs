@@ -1,7 +1,5 @@
-﻿using Mobcast.Coffee.Build;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
-
 
 namespace Mobcast.Coffee.Build
 {
@@ -38,7 +36,7 @@ namespace Mobcast.Coffee.Build
 
 		public void ApplySettings(ProjectBuilder builder)
 		{
-			PlayerSettings.Android.bundleVersionCode = builder.versionCode;
+			PlayerSettings.Android.bundleVersionCode = int.Parse(builder.FullVersionCode);
 			PlayerSettings.Android.keystoreName = keystoreFile;
 			PlayerSettings.Android.keystorePass = keystorePassword;
 			PlayerSettings.Android.keyaliasName = keystoreAliasName;

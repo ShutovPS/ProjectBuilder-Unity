@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using System.Text;
+using UnityEditor.Build.Reporting;
 
 namespace Mobcast.Coffee.Build
 {
@@ -21,7 +22,7 @@ namespace Mobcast.Coffee.Build
 		//-------------------------------
 		/// <summary>Buid Application.</summary>
 		[Tooltip("Buid Application.")]
-		public bool buildApplication = true;
+		[SerializeField] public bool buildApplication = true;
 
 		/// <summary>ビルドターゲットを指定します.</summary>
 		[Tooltip("ビルドターゲットを指定します.")]
@@ -39,39 +40,73 @@ namespace Mobcast.Coffee.Build
 
 		/// <summary>会社名を指定します.</summary>
 		[Tooltip("会社名を指定します.")]
-		public string companyName;
+		[SerializeField] protected string companyName;
 
 		/// <summary>プロダクトのバンドル識別子を指定します.</summary>
 		[Tooltip("プロダクトのバンドル識別子を指定します.")]
-		public string applicationIdentifier;
+		[SerializeField] protected string applicationIdentifier;
+		
+		[SerializeField] protected string buildsPath;
+		
+		[SerializeField] protected bool openBuildPathAfterBuild;
+		
+		/// <summary>ビルド成果物出力先フルパス.</summary>
+		public string outputPath{
+			get {
+				string target = actualBuildTarget.ToString();
+
+				if (actualBuildTarget == BuildTarget.Android && EditorUserBuildSettings.exportAsGoogleAndroidProject) {
+					target = Path.Combine(target, "Projects");
+				}
+
+				return Path.Combine(buildsPath, target);
+			}
+		}
 
 		/// <summary>ビルド成果物(Xcode projectやAndroid project, apk, exe等)の出力パス.</summary>
-		public string outputPath
+		public string outputFile
 		{
-			get
-			{
-				if (actualBuildTarget == BuildTarget.Android && !EditorUserBuildSettings.exportAsGoogleAndroidProject)
-					return "build.apk";
-				else
-					return "build";
+			get {
+				string fileName = $"{applicationIdentifier}_{version}";
+
+//				if (actualBuildTarget != BuildTarget.WebGL) {
+//					fileName += $"_{FullVersionCode}";
+//				}
+				fileName += $"_{FullVersionCode}";
+				
+				if (actualBuildTarget == BuildTarget.Android && !EditorUserBuildSettings.exportAsGoogleAndroidProject) {
+					fileName += ".apk";
+				}
+
+				return fileName;
 			}
 		}
 
 		/// <summary>ビルド成果物出力先フルパス.</summary>
-		public string outputFullPath { get { return Path.Combine(Util.projectDir, outputPath); } }
-
-
+		public string outputFullPath {
+			get {
+				return Path.Combine(Util.projectDir, outputPath, outputFile);
+			}
+		}
+		
 		//-------------------------------
 		//	バージョン設定.
 		//-------------------------------
 		/// <summary>アプリのバージョンを指定します.</summary>
 		[Tooltip("アプリのバージョンを指定します.")]
-		public string version;
+		[SerializeField] public string version;
 
 		/// <summary>バンドルコードを指定します.Androidの場合はVersionCode, iOSの場合はBuildNumberに相当します.この値は、リリース毎に更新する必要があります.</summary>
 		[Tooltip("整数のバージョンコードを指定します.\nAndroidの場合はVersionCode, iOSの場合はBuildNumberに相当します.\nこの値は、リリース毎に更新する必要があります.")]
-		public int versionCode = 0;
+		[SerializeField] private int versionCode = 0;
 
+		public string FullVersionCode {
+			get {
+				if (System.Version.TryParse(version, out var v)) {
+					return $"{v.Major}{v.Minor:00}{v.Build:00}{versionCode:00}";
+				} else return versionCode.ToString();
+			}
+		}
 
 		//-------------------------------
 		//	Advanced Options.
@@ -108,16 +143,14 @@ namespace Mobcast.Coffee.Build
 
 		/// <summary>アセットバンドルビルドパス.</summary>
 		public string bundleOutputPath { get { return "AssetBundles/" + actualBuildTarget; } }
-
-
+		
 		//-------------------------------
 		//	Build Target Settings.
 		//-------------------------------
 		public BuildTargetSettings_iOS iosSettings = new BuildTargetSettings_iOS();
 		public BuildTargetSettings_Android androidSettings = new BuildTargetSettings_Android();
 		public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL();
-
-
+		
 		[System.Serializable]
 		public class SceneSetting
 		{
@@ -131,9 +164,7 @@ namespace Mobcast.Coffee.Build
 			LZ4 = BuildAssetBundleOptions.ChunkBasedCompression,
 			Uncompressed = BuildAssetBundleOptions.UncompressedAssetBundle,
 		}
-
-
-
+		
 		//-------------------------------
 		//	継承関連.
 		//-------------------------------
@@ -141,7 +172,6 @@ namespace Mobcast.Coffee.Build
 		protected virtual void OnApplySetting()
 		{
 		}
-
 
 		//-------------------------------
 		//	Unityコールバック.
@@ -163,8 +193,7 @@ namespace Mobcast.Coffee.Build
 			androidSettings.Reset();
 			iosSettings.Reset();
 		}
-
-
+		
 		//-------------------------------
 		//	アクション.
 		//-------------------------------
@@ -223,8 +252,10 @@ namespace Mobcast.Coffee.Build
 			//実行引数に開発ビルド番号定義がある場合、ビルド番号を再定義します.
 			PlayerSettings.bundleVersion = version;
 			string buildNumber;
-			if (developmentBuild && Util.executeArguments.TryGetValue(Util.OPT_DEV_BUILD_NUM, out buildNumber) && !string.IsNullOrEmpty(buildNumber))
+			if (developmentBuild && Util.executeArguments.TryGetValue(Util.OPT_DEV_BUILD_NUM, out buildNumber) && !string.IsNullOrEmpty(buildNumber)) {
 				PlayerSettings.bundleVersion += "." + buildNumber;
+			}
+			
 			File.WriteAllText(Path.Combine(Util.projectDir, "BUILD_VERSION"), PlayerSettings.bundleVersion);
 
 			// Scene Settings.
@@ -362,39 +393,24 @@ namespace Mobcast.Coffee.Build
 
 				// Start build.
 				UnityEngine.Debug.Log(kLogType + "BuildPlayer is started. Defined symbols : " + PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup));
-#if UNITY_2018_1_OR_NEWER
-				var buildReport = BuildPipeline.BuildPlayer(scenesToBuild, outputFullPath, actualBuildTarget, opt);
+				var errorMsg = BuildPipeline.BuildPlayer(scenesToBuild, outputFullPath, actualBuildTarget, opt);
 
 				// Revert excluded directories.
 				Util.RevertExcludedDirectory();
 
-				if (buildReport.summary.result == UnityEditor.Build.Reporting.BuildResult.Succeeded)
+				if (errorMsg.summary.result == BuildResult.Succeeded)
 				{
 					UnityEngine.Debug.Log(kLogType + "BuildPlayer is finished successfuly.");
-					Util.RevealOutputInFinder(outputFullPath);
-				}
-				else
-				{
-					UnityEngine.Debug.LogError(kLogType + "BuildPlayer is failed : " + buildReport.summary.result);
-					return false;
-				}
-#else
-				string errorMsg = BuildPipeline.BuildPlayer(scenesToBuild, outputFullPath, actualBuildTarget, opt);
-
-				// Revert excluded directories.
-				Util.RevertExcludedDirectory();
-
-				if (string.IsNullOrEmpty(errorMsg))
-				{
-					UnityEngine.Debug.Log(kLogType + "BuildPlayer is finished successfuly.");
-					Util.RevealOutputInFinder(outputFullPath);
+					
+					if (openBuildPathAfterBuild) {
+						Util.RevealOutputInFinder(outputFullPath);
+					}
 				}
 				else
 				{
 					UnityEngine.Debug.LogError(kLogType + "BuildPlayer is failed : " + errorMsg);
 					return false;
 				}
-#endif
 			}
 			return true;
 		}
@@ -402,12 +418,13 @@ namespace Mobcast.Coffee.Build
 		/// <summary>
 		/// Build method for CUI(-executeMethod option).
 		/// </summary>
-		static void Build()
+		protected static void Build()
 		{
 			Util.StartBuild(Util.GetBuilderFromExecuteArgument(), false, false);
 		}
 
-		#if UNITY_CLOUD_BUILD
+#if UNITY_CLOUD_BUILD
+
 		/// <summary>
 		/// Pre-export method for Unity Cloud Build.
 		/// </summary>
@@ -416,6 +433,7 @@ namespace Mobcast.Coffee.Build
 			Util.executeArguments[Util.OPT_DEV_BUILD_NUM] = manifest.GetValue("buildNumber", "unknown");
 			Util.GetBuilderFromExecuteArgument().ApplySettings();
 		}
-#endif
+		
+#endif // UNITY_CLOUD_BUILD
 	}
 }

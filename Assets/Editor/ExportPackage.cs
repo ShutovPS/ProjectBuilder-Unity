@@ -1,23 +1,25 @@
 ﻿using UnityEditor;
 
-namespace Mobcast.Coffee.Build
-{
-	public static class ExportPackage
-	{
-		const string kPackageName = "ProjectBuilder.unitypackage";
-		static readonly string[] kAssetPathes = {
-			"Assets/Mobcast/Coffee/Editor/ProjectBuilder",
+namespace Mobcast.Coffee.Build {
+	public static class ExportPackage {
+		private const string kPackageName = "Unity-ProjectBuilder";
+		private const string kPackageVersion = "1.0.1";
+
+		private static readonly string[] kAssetPathes = {
+			"Assets/Unity-ProjectBuilder",
 		};
 
-		[MenuItem ("Export Package/" + kPackageName)]
-		[InitializeOnLoadMethod]
-		static void Export ()
-		{
-			if (EditorApplication.isPlayingOrWillChangePlaymode)
+		[MenuItem("Export Package/" + kPackageName)]
+//		[InitializeOnLoadMethod]
+		private static void Export() {
+			if (EditorApplication.isPlayingOrWillChangePlaymode) {
 				return;
+			}
+
+			AssetDatabase.ExportPackage(kAssetPathes, $"{kPackageName}-{kPackageVersion}.unitypackage".ToLower(),
+			                            ExportPackageOptions.Recurse | ExportPackageOptions.Default);
 			
-			AssetDatabase.ExportPackage (kAssetPathes, kPackageName, ExportPackageOptions.Recurse | ExportPackageOptions.Default);
-			UnityEngine.Debug.Log ("Export successfully : " + kPackageName);
+			UnityEngine.Debug.Log("Export successfully : " + kPackageName);
 		}
 	}
 }

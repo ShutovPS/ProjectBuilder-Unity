@@ -1,11 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using System;
 using System.IO;
-using System.Text;
-
 
 namespace Mobcast.Coffee.Build
 {
@@ -26,8 +22,9 @@ namespace Mobcast.Coffee.Build
 			{
 				r.width -= 14;
 				string newValue = EditorGUI.TextField (r, label, property.stringValue);
-				if (EditorGUI.EndChangeCheck ())
+				if (EditorGUI.EndChangeCheck ()) {
 					property.stringValue = newValue;
+				}
 			}
 
 			// Select file button.
@@ -38,6 +35,7 @@ namespace Mobcast.Coffee.Build
 				if (!string.IsNullOrEmpty (path)) {
 					property.stringValue = path.Replace(Environment.CurrentDirectory + Path.DirectorySeparatorChar, "");
 				}
+				
 				GUIUtility.keyboardControl = 0;
 			}
 			EditorGUI.EndProperty ();
@@ -52,9 +50,12 @@ namespace Mobcast.Coffee.Build
 			EditorGUI.BeginChangeCheck ();
 			{
 				position.width -= 14;
+				
 				string newValue = EditorGUI.TextField (position, label, property.stringValue);
-				if (EditorGUI.EndChangeCheck ())
+				
+				if (EditorGUI.EndChangeCheck ()) {
 					property.stringValue = newValue;
+				}
 			}
 
 			// Select file button.
@@ -62,9 +63,11 @@ namespace Mobcast.Coffee.Build
 			if (GUI.Button (rButton, EditorGUIUtility.FindTexture ("project"), EditorStyles.label)) {
 				string directory = 0 < property.stringValue.Length && Directory.Exists(property.stringValue) ? property.stringValue : "Assets/";
 				string path = EditorUtility.OpenFolderPanel (title, directory, "");
+				
 				if (!string.IsNullOrEmpty (path)) {
 					property.stringValue = path.Replace(Environment.CurrentDirectory + Path.DirectorySeparatorChar, "");
 				}
+				
 				GUIUtility.keyboardControl = 0;
 			}
 			EditorGUI.EndProperty ();
@@ -83,16 +86,20 @@ namespace Mobcast.Coffee.Build
 		public static void TextFieldWithTemplate (Rect r, SerializedProperty property, GUIContent label, string[] displayedOptions, bool maskable, params GUILayoutOption[] options)
 		{
 			var content = EditorGUI.BeginProperty (r, label, property);
-			if (maskable)
+			
+			if (maskable) {
 				content.text += " (;)";
+			}
 
 			// TextField (free edit).
 			EditorGUI.BeginChangeCheck ();
 			{
 				r.width -= 14;
 				string newValue = EditorGUI.TextField (r, content, property.stringValue);
-				if (EditorGUI.EndChangeCheck ())
+				
+				if (EditorGUI.EndChangeCheck ()) {
 					property.stringValue = newValue;
+				}
 			}
 
 			// Template menu button.
@@ -131,8 +138,9 @@ namespace Mobcast.Coffee.Build
 
 			static void CacheGUI ()
 			{
-				if (styleHeader != null)
+				if (styleHeader != null) {
 					return;
+				}
 
 				styleHeader = new GUIStyle ("RL Header");
 				styleHeader.alignment = TextAnchor.MiddleLeft;

@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -12,24 +13,27 @@ MonoBehaviour:
   m_Name: Default iOS
   m_EditorClassIdentifier: 
   buildApplication: 1
+  buildTarget: 9
+  productName: ProjectBuilder
+  companyName: DefaultCompany
+  applicationIdentifier: com.defaultcompany.projectbuilder
+  buildsPath: 
+  version: 1.0.1
+  versionCode: 1000101
+  developmentBuild: 0
+  defineSymbols: SAMPLE
+  scenes: []
+  excludeDirectories: []
   buildAssetBundle: 1
   copyToStreamingAssets: 0
   bundleOptions: 0
-  buildTarget: 9
-  developmentBuild: 0
-  defineSymbols: DEVELOPMENT_BUILD;aaaa
-  productName: ProjectBuilder
-  companyName: mobcast
-  applicationIdentifier: com.mobcast.projectbuilder
-  version: 1.0
-  versionCode: 0
   iosSettings:
     automaticallySign: 0
     developerTeamId: 
     codeSignIdentity: 
     profileId: 
     profileSpecifier: 
-    languages: jp;en
+    languages: en;ru
     generateExportOptionPlist: 0
     exportMethod: development
     uploadBitcode: 0
@@ -42,4 +46,3 @@ MonoBehaviour:
     keystorePassword: 
     keystoreAliasName: 
     keystoreAliasPassword: 
-  scenes: []

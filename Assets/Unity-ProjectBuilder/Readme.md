@@ -157,6 +157,14 @@ public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL()
 
 ## Release Notes
 
+### ver.1.0.1:
+
+* Feature: Update build number system.
+* Feature: Update output build names.
+* Feature: Add custom build.
+* Improvement: Code refactoring.
+
+
 ### ver.1.0.0:
 
 * Feature: Override builder with json on command line.
@@ -257,5 +265,8 @@ public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL()
 
 ## See Also
 
-* GitHub Page : https://github.com/mob-sakai/ProjectBuilder
-* Issue tracker : https://github.com/mob-sakai/ProjectBuilder/issues
+* GitHub Page : https://github.com/ShutovPS/Unity-ProjectBuilder
+* Issue tracker : https://github.com/ShutovPS/Unity-ProjectBuilder/issues
+
+* Original GitHub Page : https://github.com/mob-sakai/ProjectBuilder
+* Original Issue tracker : https://github.com/mob-sakai/ProjectBuilder/issues

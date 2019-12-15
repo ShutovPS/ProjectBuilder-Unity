@@ -1,15 +1,12 @@
-﻿using Mobcast.Coffee.Build;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
-
 
 namespace Mobcast.Coffee.Build
 {
 	/// <summary>
 	/// Build target settings interface.
 	/// </summary>
-	public interface IBuildTargetSettings
-	{
+	public interface IBuildTargetSettings {
 		/// <summary>
 		/// Build target.
 		/// </summary>

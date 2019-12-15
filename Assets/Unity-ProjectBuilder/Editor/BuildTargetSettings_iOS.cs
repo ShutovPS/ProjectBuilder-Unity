@@ -1,13 +1,11 @@
-﻿using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Mobcast.Coffee.Build;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEditor.Callbacks;
 
 #if UNITY_IOS
+
 using UnityEditor.iOS.Xcode;
+
 #endif
 
 namespace Mobcast.Coffee.Build
@@ -141,7 +139,7 @@ namespace Mobcast.Coffee.Build
 
 		public void ApplySettings(ProjectBuilder builder)
 		{
-			PlayerSettings.iOS.buildNumber = builder.versionCode.ToString();
+			PlayerSettings.iOS.buildNumber = builder.FullVersionCode.ToString();
 #if UNITY_5_4_OR_NEWER
 			PlayerSettings.iOS.appleDeveloperTeamID = developerTeamId;
 #endif
