@@ -6,7 +6,8 @@ ProjectBuilder
 A tool for easy automating and customizing build process for Unity.
 
 ### Basic & Advanced Aplication Build Settings
-![image](https://user-images.githubusercontent.com/12690315/31534409-c342b2a4-b031-11e7-8fea-75bb916ef944.png)
+
+<img src="https://raw.githubusercontent.com/ShutovPS/Unity-ProjectBuilder/master/res/images/advanced_aplication_build_settings.png" width="300" />
 
 * Build target
     * Build artifact is generated in `<project_dir>/build` directory or file.
@@ -54,16 +55,17 @@ A tool for easy automating and customizing build process for Unity.
 
 ## Requirement
 
-* Unity5.3+ *(included Unity 2017.x)*
-* No other SDK
+* Unity5.3+ *(included Unity 2019.x)*
 
 
 
 
 ## Usage
 
-1. Download [ProjectBuilder.unitypackage](https://github.com/mob-sakai/ProjectBuilder/raw/master/ProjectBuilder.unitypackage) and install to your project.
-1. From the menu, click `Coffee` > `Project Builder`
+1. Download [
+Unity-ProjectBuilder
+](https://github.com/ShutovPS/Unity-ProjectBuilder/releases/latest) and install to your project.
+1. From the menu, click `Project Builder` > `Builder` (Cmnd+Shift+W) / (Ctrl+Shift+W)
 1. Input build configurations.
 1. Click `Buid` button to build application.
 1. Build artifact is generated in `<project_dir>/build` directory or file.
