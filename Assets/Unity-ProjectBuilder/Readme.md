@@ -62,9 +62,8 @@ A tool for easy automating and customizing build process for Unity.
 
 ## Usage
 
-1. Download [
-Unity-ProjectBuilder
-](https://github.com/ShutovPS/Unity-ProjectBuilder/releases/latest) and install to your project.
+1. Download Unity-ProjectBuilder
+[latest](https://github.com/ShutovPS/Unity-ProjectBuilder/raw/master/unity-projectbuilder-1.0.1.unitypackage) or from [releases](https://github.com/ShutovPS/Unity-ProjectBuilder/releases/latest) and install to your project.
 1. From the menu, click `Project Builder` > `Builder` (Cmnd+Shift+W) / (Ctrl+Shift+W)
 1. Input build configurations.
 1. Click `Buid` button to build application.
@@ -158,6 +157,10 @@ public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL()
 
 
 ## Release Notes
+
+### ver.1.0.2:
+
+* Feature: Add more settings for Android (Scripting Backend, Target Architecture, Build Mode)
 
 ### ver.1.0.1:
 

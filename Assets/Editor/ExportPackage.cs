@@ -3,21 +3,26 @@
 namespace Mobcast.Coffee.Build {
 	public static class ExportPackage {
 		private const string kPackageName = "Unity-ProjectBuilder";
-		private const string kPackageVersion = "1.0.1";
+		private const string kPackageVersion = "1.0.2";
 
 		private static readonly string[] kAssetPathes = {
 			"Assets/Unity-ProjectBuilder",
 		};
 
 		[MenuItem("Export Package/" + kPackageName)]
-//		[InitializeOnLoadMethod]
+	//		[InitializeOnLoadMethod]
 		private static void Export() {
 			if (EditorApplication.isPlayingOrWillChangePlaymode) {
 				return;
 			}
 
-			AssetDatabase.ExportPackage(kAssetPathes, $"{kPackageName}-{kPackageVersion}.unitypackage".ToLower(),
-			                            ExportPackageOptions.Recurse | ExportPackageOptions.Default);
+			string fileName = $"{kPackageName}-{kPackageVersion}.unitypackage".ToLower();
+			AssetDatabase.ExportPackage(kAssetPathes, fileName,
+				ExportPackageOptions.Recurse | ExportPackageOptions.Default);
+			
+			string latestFileName = $"{kPackageName}-latest.unitypackage".ToLower();
+			AssetDatabase.ExportPackage(kAssetPathes, latestFileName,
+				ExportPackageOptions.Recurse | ExportPackageOptions.Default);
 			
 			UnityEngine.Debug.Log("Export successfully : " + kPackageName);
 		}

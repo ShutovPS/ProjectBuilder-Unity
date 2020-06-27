@@ -18,8 +18,9 @@ MonoBehaviour:
   companyName: 
   applicationIdentifier: 
   buildsPath: 
+  openBuildPathAfterBuild: 0
   version: 1.0.1
-  versionCode: 1000101
+  versionCode: 1
   developmentBuild: 0
   defineSymbols: SAMPLE
   scenes: []
@@ -46,3 +47,6 @@ MonoBehaviour:
     keystorePassword: 
     keystoreAliasName: 
     keystoreAliasPassword: 
+    _scriptingBackend: 0
+    _targetArchitecture: 1
+    _buildMode: 0
