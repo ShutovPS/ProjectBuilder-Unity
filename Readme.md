@@ -7,7 +7,7 @@ A tool for easy automating and customizing build process for Unity.
 
 ### Basic & Advanced Aplication Build Settings
 
-<img src="https://raw.githubusercontent.com/ShutovPS/Unity-ProjectBuilder/master/res/images/advanced_aplication_build_settings.png" width="300" />
+<img src=".github/images/advanced_aplication_build_settings.png" width="300" />
 
 * Build target
     * Build artifact is generated in `<project_dir>/build` directory or file.
@@ -25,22 +25,15 @@ A tool for easy automating and customizing build process for Unity.
     * (Android) BundleVersionCode
     * (iOS) BuildNumber
 
-### AssetBundle Build Settings
-![image](https://user-images.githubusercontent.com/12690315/31534416-cc880864-b031-11e7-8575-1010062d385e.png)
-
-* Compression options
-* Build artifacts are generated in `<project_dir>/AssetBundles` directory
-* Copy to StreamingAssets directory
-
 
 ### Android Settings
-![image](https://user-images.githubusercontent.com/12690315/31534438-e913876a-b031-11e7-9317-204c13a960e8.png)
+<img src=".github/images/android_settings.png" width="300" />
 
 * Keystore infomation
 
 
 ### iOS Settings
-![image](https://user-images.githubusercontent.com/12690315/31534427-d693dd38-b031-11e7-96ba-984722562aff.png)
+<img src=".github/images/ios_settings.png" width="300" />
 
 * XCode modifier
     * Languages
@@ -51,6 +44,12 @@ A tool for easy automating and customizing build process for Unity.
 * Generate exportOptions.plist
 
 
+### AssetBundle Build Settings
+<img src=".github/images/build_assetbundles.png" width="300" />
+
+* Compression options
+* Build artifacts are generated in `<project_dir>/AssetBundles` directory
+* Copy to StreamingAssets directory
 
 
 ## Requirement
@@ -58,18 +57,27 @@ A tool for easy automating and customizing build process for Unity.
 * Unity5.3+ *(included Unity 2019.x)*
 
 
+## Instalation
+
+### Using Git
+
+Find the manifest.json file in the Packages folder of your project and add a line to `dependencies` field.
+
+* `"dev.fd.projectbuilder": "https://github.com/ShutovPS/ProjectBuilder-Unity.git"`
+
+To update the package, change suffix `#{version}` to the target version.
+
+* `"dev.fd.projectbuilder": "https://github.com/ShutovPS/ProjectBuilder-Unity.git#1.0.3",`
+
+Or, use [UpmGitExtension](https://github.com/mob-sakai/UpmGitExtension) to install and update the package.
 
 
 ## Usage
 
-1. Download Unity-ProjectBuilder
-[latest](https://github.com/ShutovPS/Unity-ProjectBuilder/raw/master/unity-projectbuilder-1.0.1.unitypackage) or from [releases](https://github.com/ShutovPS/Unity-ProjectBuilder/releases/latest) and install to your project.
 1. From the menu, click `Project Builder` > `Builder` (Cmnd+Shift+W) / (Ctrl+Shift+W)
-1. Input build configurations.
-1. Click `Buid` button to build application.
-1. Build artifact is generated in `<project_dir>/build` directory or file.
-
-
+2. Input build configurations.
+3. Click `Buid` button to build application.
+4. Build artifact is generated in build directory.
 
 
 ## Build on command line
@@ -96,39 +104,11 @@ For other infomation, see this link : <https://docs.unity3d.com/Manual/CommandLi
 * To override other parameters, convert the builder to json from `Convert to JSON (console log)` in project builder window.
 
 
-
-
 ## Build on Unity Cloud Build(UCB)
 
 1. Type `Mobcast.Coffee.Build.ProjectBuilder.PreExport` at `Config > Advanced Settings > Pre-Export Method Name` on UCB.
 1. Builder asset used for building will be selected automatically based on build setting label.  
 For example, a build setting labeled 'Default iOS' on UCB, selects builder asset named 'Default iOS' in project.
-
-
-
-
-## How to customize the builder for your project?
-
-1. Click `Create Custom Project Builder Script`
-1. Save script with dialog.
-1. Implement the script.  
-The serialized field is not only displayed in the inspector, it can also be used in PostProcessBuild as following.
-
-![image](https://user-images.githubusercontent.com/12690315/28651867-64891a28-72bf-11e7-911a-f7f13a371def.png)
-
-```cs
-[SerializeField] string stringParameter;
-
-[PostProcessBuild]
-protected static void OnPostProcessBuild(BuildTarget target, string path)
-{
-    CustomProjectBuilder current = Util.currentBuilder as CustomProjectBuilder;
-    Debug.Log(current.stringParameter);
-    ...
-}
-```
-
-
 
 
 ## How to add a supported build target to build?
@@ -157,6 +137,13 @@ public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL()
 
 
 ## Release Notes
+
+### ver.1.0.3:
+
+* Feature: Update to upm
+* Feature: Update android settings
+* Feature: Add platform switcher
+* Improvement: Code refactoring.
 
 ### ver.1.0.2:
 
@@ -270,8 +257,8 @@ public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL()
 
 ## See Also
 
-* GitHub Page : https://github.com/ShutovPS/Unity-ProjectBuilder
-* Issue tracker : https://github.com/ShutovPS/Unity-ProjectBuilder/issues
+* GitHub Page : https://github.com/ShutovPS/ProjectBuilder-Unity
+* Issue tracker : https://github.com/ShutovPS/ProjectBuilderr-Unity/issues
 
 * Original GitHub Page : https://github.com/mob-sakai/ProjectBuilder
 * Original Issue tracker : https://github.com/mob-sakai/ProjectBuilder/issues
