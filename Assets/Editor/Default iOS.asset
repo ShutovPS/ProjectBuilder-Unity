@@ -34,7 +34,7 @@ MonoBehaviour:
     codeSignIdentity: 
     profileId: 
     profileSpecifier: 
-    languages: en;ru
+    languages: en
     generateExportOptionPlist: 0
     exportMethod: development
     uploadBitcode: 0
@@ -43,6 +43,7 @@ MonoBehaviour:
     services: 
     frameworks: 
   androidSettings:
+    useCustomKeystore: 0
     keystoreFile: 
     keystorePassword: 
     keystoreAliasName: 

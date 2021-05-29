@@ -1,0 +1,4 @@
+[submodule "Assets/ProjectBuilder-Unity"]
+	path = Assets/ProjectBuilder-Unity
+	url = https://github.com/ShutovPS/ProjectBuilder-Unity
+	branch = upm

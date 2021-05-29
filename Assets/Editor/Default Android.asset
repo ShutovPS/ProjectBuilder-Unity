@@ -43,6 +43,7 @@ MonoBehaviour:
     services: 
     frameworks: 
   androidSettings:
+    useCustomKeystore: 0
     keystoreFile: 
     keystorePassword: 
     keystoreAliasName: 
