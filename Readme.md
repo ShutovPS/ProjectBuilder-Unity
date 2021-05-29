@@ -1,1 +1,1 @@
-/Users/shutov/Documents/unity_projects/not_games/ProjectBuilder/ProjectBuilder-Unity [dev]/Assets/ProjectBuilder-Unity/Readme.md
+Assets/ProjectBuilder-Unity/Readme.md
