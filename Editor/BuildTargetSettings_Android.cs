@@ -1,4 +1,8 @@
-﻿using System;
+﻿#if UNITY_2019_3_OR_NEWER || UNITY_2020_1_OR_NEWER
+    #define SYMBOLS_ZIP_AVAILABLE
+#endif // UNITY_2019_3_OR_NEWER || UNITY_2020_1_OR_NEWER
+
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -8,17 +12,6 @@ namespace Mobcast.Coffee.Build
     [Serializable]
     public class BuildTargetSettings_Android : IBuildTargetSettings
     {
-        public BuildTarget buildTarget
-        {
-            get { return BuildTarget.Android; }
-        }
-
-        public Texture icon
-        {
-            get { return EditorGUIUtility.FindTexture("BuildSettings.Android.Small"); }
-        }
-
-
 #region KEYSTORE
 
         /// <summary>Enable application signing with a custom keystore.</summary>
@@ -42,8 +35,7 @@ namespace Mobcast.Coffee.Build
         [SerializeField] private string keystoreAliasPassword = "";
 
 #endregion KEYSTORE
-
-
+        
 #region TARGET
 
         [SerializeField] private EScriptingBackend _scriptingBackend = EScriptingBackend.Mono2x;
@@ -53,9 +45,32 @@ namespace Mobcast.Coffee.Build
         [SerializeField] private EBuildMode _buildMode = EBuildMode.APK;
 
 #endregion TARGET
+        
+        /// <summary>Set to true to create a symbols.zip file in the same location as the .apk or .aab file.</summary>
+        [Tooltip("Set to true to create a symbols.zip file in the same location as the .apk or .aab file.")]
+        [SerializeField] private bool _createSymbolsZip = false;
 
 
         [NonSerialized] private static bool _hidePasswords = true;
+        
+
+        private static readonly Dictionary<AndroidArchitecture, EScriptingBackend> _available =
+            new Dictionary<AndroidArchitecture, EScriptingBackend>()
+            {
+                {AndroidArchitecture.ARM64, EScriptingBackend.IL2CPP}
+            };
+        
+        
+        public BuildTarget buildTarget
+        {
+            get { return BuildTarget.Android; }
+        }
+
+        public Texture icon
+        {
+            get { return EditorGUIUtility.FindTexture("BuildSettings.Android.Small"); }
+        }
+        
 
         public void Reset()
         {
@@ -66,12 +81,10 @@ namespace Mobcast.Coffee.Build
             keystorePassword = PlayerSettings.Android.keystorePass;
             keystoreAliasName = PlayerSettings.Android.keyaliasName;
             keystoreAliasPassword = PlayerSettings.Android.keyaliasPass;
-
-
+            
             _scriptingBackend =
                 (EScriptingBackend)PlayerSettings.GetScriptingBackend(BuildTargetGroup.Android);
             _targetArchitecture = (AndroidArchitecture)PlayerSettings.Android.targetArchitectures;
-
 
             bool exportAsGoogleAndroidProject = EditorUserBuildSettings.exportAsGoogleAndroidProject;
             bool buildAppBundle = EditorUserBuildSettings.buildAppBundle;
@@ -88,6 +101,10 @@ namespace Mobcast.Coffee.Build
             {
                 _buildMode = EBuildMode.APK;
             }
+
+#if SYMBOLS_ZIP_AVAILABLE
+            _createSymbolsZip = EditorUserBuildSettings.androidCreateSymbolsZip;
+#endif // SYMBOLS_ZIP_AVAILABLE
         }
 
         public void ApplySettings(ProjectBuilder builder)
@@ -120,6 +137,10 @@ namespace Mobcast.Coffee.Build
                     EditorUserBuildSettings.buildAppBundle = true;
                     break;
             }
+            
+#if SYMBOLS_ZIP_AVAILABLE
+            EditorUserBuildSettings.androidCreateSymbolsZip = _createSymbolsZip;
+#endif // SYMBOLS_ZIP_AVAILABLE
         }
 
         /// <summary>
@@ -134,6 +155,8 @@ namespace Mobcast.Coffee.Build
                 DrawTarget(settings);
 
                 DrawKeystore(settings);
+                
+                DrawSymbolsZip(settings);
             }
         }
 
@@ -257,12 +280,30 @@ namespace Mobcast.Coffee.Build
             }
         }
 
-        private static readonly Dictionary<AndroidArchitecture, EScriptingBackend> _available =
-            new Dictionary<AndroidArchitecture, EScriptingBackend>()
-            {
-                {AndroidArchitecture.ARM64, EScriptingBackend.IL2CPP}
-            };
+        private static void DrawSymbolsZip(SerializedProperty settings)
+        {
+#if SYMBOLS_ZIP_AVAILABLE
+            
+            EditorGUILayout.LabelField("symbols.zip", EditorStyles.boldLabel);
+            
+            var scriptingBackend = settings.FindPropertyRelative("_scriptingBackend");
+            var sb = (EScriptingBackend)scriptingBackend.longValue;
+            
+            EditorGUI.BeginDisabledGroup(sb != EScriptingBackend.IL2CPP);
 
+            EditorGUI.indentLevel++;
+            {
+                var createSymbolsZip = settings.FindPropertyRelative("_createSymbolsZip");
+                EditorGUILayout.PropertyField(createSymbolsZip, new GUIContent("Create symbols.zip"));
+            }
+            EditorGUI.indentLevel--;
+            
+            EditorGUI.EndDisabledGroup();
+            
+#endif // SYMBOLS_ZIP_AVAILABLE
+        }
+
+        
         [Serializable]
         private enum EScriptingBackend
         {
