@@ -1,4 +1,7 @@
 ProjectBuilder
+
+===
+### v1.0.4
 ===
 
 ## Overview
@@ -54,7 +57,7 @@ A tool for easy automating and customizing build process for Unity.
 
 ## Requirement
 
-* Unity5.3+ *(included Unity 2019.x)*
+* Unity 2019.+
 
 
 ## Instalation
@@ -134,9 +137,12 @@ public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL()
 ```
 
 
-
-
 ## Release Notes
+
+### ver.1.0.4:
+
+* Feature: Add android symbols.zip settings
+* Fix: Fix Assembly Definitions
 
 ### ver.1.0.3:
 
@@ -155,7 +161,6 @@ public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL()
 * Feature: Update output build names.
 * Feature: Add custom build.
 * Improvement: Code refactoring.
-
 
 ### ver.1.0.0:
 
@@ -253,7 +258,9 @@ public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL()
 * Feature: Export `BUILD_VERSION` for CI.
 
 
+## License
 
+MIT License (see [LICENSE](LICENSE))
 
 ## See Also
 
