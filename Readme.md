@@ -9,7 +9,7 @@ ProjectBuilder
 A tool for easy automating and customizing build process for Unity.
 
 ### Builders
-<img src=".res/images/builder.jpeg" width="300" />
+<img src=".res/images/builder_settings.jpeg" width="300" />
 
 * Build target
     - Build artifact is generated in `<project_dir>/build` directory or file.
@@ -39,7 +39,7 @@ A tool for easy automating and customizing build process for Unity.
 
 
 ### iOS Settings
-<img src=".res/images/ios_settings.jpg" width="300" />
+<img src=".res/images/ios_settings.jpeg" width="300" />
 
 * XCode modifier
     - Languages
