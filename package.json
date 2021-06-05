@@ -1,7 +1,7 @@
 {
   "name": "dev.fd.projectbuilder",
   "displayName": "ProjectBuilder",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "unity": "2019.4",
   "license": "MIT",
   "repository": {
@@ -13,7 +13,7 @@
   "dependencies": {
   },
   "author": {
-    "name": "fd_crash",
+    "name": "mob-sakai & fd_crash",
     "url" : "https://github.com/ShutovPS/"
   },
   "type": "library"

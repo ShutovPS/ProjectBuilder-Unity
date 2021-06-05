@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace Mobcast.Coffee.Build
+namespace Mobcast.Coffee.Build.Editor
 {
     /// <summary>
     /// Compile Utility.
@@ -19,8 +19,7 @@ namespace Mobcast.Coffee.Build
         /// This field is 'Serialized' in ScriptableSingleton.
         /// Therefore, callbacks are retained even after compile.
         /// </summary>
-        [SerializeField]
-        List<string> m_OnFinishedCompile = new List<string>();
+        [SerializeField] List<string> m_OnFinishedCompile = new List<string>();
 
         /// <summary>
         /// Request script compile.
@@ -69,7 +68,7 @@ namespace Mobcast.Coffee.Build
         /// On finished compile successfully.
         /// </summary>
         [InitializeOnLoadMethod]
-        static void OnFinishedCompileSuccessfully()
+        private static void OnFinishedCompileSuccessfully()
         {
             // Compiling is finished successfully.
             // Call OnFinishedCompile callback next frame.
@@ -96,7 +95,7 @@ namespace Mobcast.Coffee.Build
             };
         }
 
-        void OnFinishedCompile(bool successfully)
+        private void OnFinishedCompile(bool successfully)
         {
             // Invoke all callbacks.
             foreach (var methodPath in m_OnFinishedCompile.ToArray())
