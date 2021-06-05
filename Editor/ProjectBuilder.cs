@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Text;
 using UnityEditor.Build.Reporting;
+using Mobcast.Coffee.Build.Editor;
 
 namespace Mobcast.Coffee.Build
 {
@@ -12,7 +13,7 @@ namespace Mobcast.Coffee.Build
     /// プロジェクトのビルド設定を管理するクラスです.
     /// このクラスを継承すると、プロジェクトごとの独自処理を追加できます.
     /// </summary>
-    public class ProjectBuilder : ScriptableObject
+    public class ProjectBuilder : ScriptableObject, IProjectBuilder
     {
         public const string kLogType = "#### [ProjectBuilder] ";
 
@@ -20,195 +21,157 @@ namespace Mobcast.Coffee.Build
         //-------------------------------
         //	ビルド概要.
         //-------------------------------
-        /// <summary>Buid Application.</summary>
-        [Tooltip("Buid Application.")]
-        [SerializeField] public bool buildApplication = true;
+        /// <summary>Build Application.</summary>
+        [Tooltip("Build Application.")]
+        [SerializeField] protected bool _buildApplication = true;
 
         /// <summary>ビルドターゲットを指定します.</summary>
         [Tooltip("ビルドターゲットを指定します.")]
-        public BuildTarget buildTarget;
+        [SerializeField] protected BuildTarget _buildTarget = BuildTarget.NoTarget;
 
-        /// <summary>ビルドに利用するターゲット.</summary>
-        public BuildTarget actualBuildTarget
-        {
-            get { return buildApplication ? buildTarget : EditorUserBuildSettings.activeBuildTarget; }
-        }
-
-        /// <summary>Build target group for this builder asset.</summary>
-        public BuildTargetGroup buildTargetGroup
-        {
-            get { return BuildPipeline.GetBuildTargetGroup(actualBuildTarget); }
-        }
 
         /// <summary>端末に表示されるプロダクト名を指定します.</summary>
         [Tooltip("端末に表示されるプロダクト名を指定します.")]
-        public string productName;
+        [SerializeField] protected string _productName = null;
 
         /// <summary>会社名を指定します.</summary>
         [Tooltip("会社名を指定します.")]
-        [SerializeField] protected string companyName;
+        [SerializeField] protected string _companyName = null;
+
 
         /// <summary>プロダクトのバンドル識別子を指定します.</summary>
         [Tooltip("プロダクトのバンドル識別子を指定します.")]
-        [SerializeField] protected string applicationIdentifier;
+        [SerializeField] protected string _applicationIdentifier = null;
 
-        [SerializeField] protected string buildsPath;
 
-        [SerializeField] protected bool openBuildPathAfterBuild;
+        [SerializeField] protected string _buildsPath = "Build";
+        [SerializeField] protected string _buildsDirectoryName = "$PLATFORM";
+        [SerializeField] protected string _buildsName = "$IDENTIFIER_$VERSION_$VERSION_CODE_LONG$EXECUTABLE";
 
-        /// <summary>ビルド成果物出力先フルパス.</summary>
-        public string outputPath
-        {
-            get
-            {
-                string target = actualBuildTarget.ToString();
-
-                if (actualBuildTarget == BuildTarget.Android && EditorUserBuildSettings.exportAsGoogleAndroidProject)
-                {
-                    target = Path.Combine(target, "Projects");
-                }
-
-                return Path.Combine(buildsPath, target);
-            }
-        }
-
-        /// <summary>ビルド成果物(Xcode projectやAndroid project, apk, exe等)の出力パス.</summary>
-        public string outputFile
-        {
-            get
-            {
-                string fileName = $"{applicationIdentifier}_{version}";
-
-                //				if (actualBuildTarget != BuildTarget.WebGL) {
-                //					fileName += $"_{FullVersionCode}";
-                //				}
-                fileName += $"_{FullVersionCode}";
-
-                if (actualBuildTarget == BuildTarget.Android && !EditorUserBuildSettings.exportAsGoogleAndroidProject)
-                {
-                    fileName += ".apk";
-                }
-
-                return fileName;
-            }
-        }
-
-        /// <summary>ビルド成果物出力先フルパス.</summary>
-        public string outputFullPath
-        {
-            get { return Path.Combine(Util.projectDir, outputPath, outputFile); }
-        }
+        [SerializeField] protected bool _openBuildPathAfterBuild = false;
 
         //-------------------------------
         //	バージョン設定.
         //-------------------------------
         /// <summary>アプリのバージョンを指定します.</summary>
         [Tooltip("アプリのバージョンを指定します.")]
-        [SerializeField] public string version;
+        [SerializeField] protected string _version = "1.0.0";
 
         /// <summary>バンドルコードを指定します.Androidの場合はVersionCode, iOSの場合はBuildNumberに相当します.この値は、リリース毎に更新する必要があります.</summary>
         [Tooltip("整数のバージョンコードを指定します.\nAndroidの場合はVersionCode, iOSの場合はBuildNumberに相当します.\nこの値は、リリース毎に更新する必要があります.")]
-        [SerializeField] private int versionCode = 0;
-
-        public string FullVersionCode
-        {
-            get
-            {
-                if (System.Version.TryParse(version, out var v))
-                {
-                    return $"{v.Major}{v.Minor:00}{v.Build:00}{versionCode:00}";
-                }
-                else return versionCode.ToString();
-            }
-        }
+        [SerializeField] protected int _versionCode = 1;
 
         //-------------------------------
         //	Advanced Options.
         //-------------------------------
         /// <summary>BuildOptions.Development and BuildOptions.AllowDebugging.</summary>
         [Tooltip("BuildOptions.Development and BuildOptions.AllowDebugging.")]
-        public bool developmentBuild = false;
+        [SerializeField] protected bool _developmentBuild = false;
 
         /// <summary>Define Script Symbols. If you have multiple definitions, separate with a semicolon(;)</summary>
         [Tooltip("Define Script Symbols.\nIf you have multiple definitions, separate with a semicolon(;)")]
         [TextArea(1, 5)]
-        public string defineSymbols = "";
+        [SerializeField] protected string _defineSymbols = null;
 
         /// <summary>Enable/Disable scenes in build</summary>
-        public SceneSetting[] scenes = new SceneSetting[] { };
+        [SerializeField] protected SceneSetting[] _scenes = new SceneSetting[] { };
 
         /// <summary>Ignore directories in build</summary>
-        public string[] excludeDirectories = new string[] { };
+        [SerializeField] protected string[] _excludeDirectories = new string[] { };
 
         //-------------------------------
         //	AssetBundles.
         //-------------------------------
-        /// <summary>Buid AssetBundle.</summary>
-        [Tooltip("Buid AssetBundle.")]
-        public bool buildAssetBundle;
+        /// <summary>Build AssetBundle.</summary>
+        [Tooltip("Build AssetBundle.")]
+        [SerializeField] protected bool _buildAssetBundle = false;
 
         /// <summary>copyToStreamingAssets.</summary>
         [Tooltip("copyToStreamingAssets.")]
-        public bool copyToStreamingAssets;
+        [SerializeField] protected bool _copyToStreamingAssets = false;
 
         /// <summary>AssetBundle options.</summary>
         [Tooltip("AssetBundle options.")]
-        public BundleOptions bundleOptions;
-
-        /// <summary>アセットバンドルビルドパス.</summary>
-        public string bundleOutputPath
-        {
-            get { return "AssetBundles/" + actualBuildTarget; }
-        }
+        [SerializeField] protected BundleOptions _bundleOptions = BundleOptions.LZ4;
 
         //-------------------------------
         //	Build Target Settings.
         //-------------------------------
-        public BuildTargetSettings_iOS iosSettings = new BuildTargetSettings_iOS();
-        public BuildTargetSettings_Android androidSettings = new BuildTargetSettings_Android();
-        public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL();
+        [SerializeField] protected iOSBuildSettings _iosSettings = new iOSBuildSettings();
+        [SerializeField] protected AndroidBuildSettings _androidSettings = new AndroidBuildSettings();
+        [SerializeField] protected WebGLBuildSettings _webGlSettings = new WebGLBuildSettings();
 
-        [System.Serializable]
-        public class SceneSetting
+
+        /// <summary>Build Application.</summary>
+        public bool BuildApplication => _buildApplication;
+
+        /// <summary>ビルドに利用するターゲット.</summary>
+        public BuildTarget ActualBuildTarget
         {
-            public bool enable = true;
-            public string name;
+            get { return _buildApplication ? _buildTarget : EditorUserBuildSettings.activeBuildTarget; }
         }
 
-        public enum BundleOptions
+        /// <summary>Build target group for this builder asset.</summary>
+        public BuildTargetGroup BuildTargetGroup
         {
-            LZMA = BuildAssetBundleOptions.None,
-            LZ4 = BuildAssetBundleOptions.ChunkBasedCompression,
-            Uncompressed = BuildAssetBundleOptions.UncompressedAssetBundle,
+            get { return BuildPipeline.GetBuildTargetGroup(ActualBuildTarget); }
         }
 
-        //-------------------------------
-        //	継承関連.
-        //-------------------------------
-        /// <summary>設定適用後コールバック.</summary>
-        protected virtual void OnApplySetting()
+        /// <summary>プロダクトのバンドル識別子を指定します.</summary>
+        public string ApplicationIdentifier => _applicationIdentifier;
+
+        /// <summary>端末に表示されるプロダクト名を指定します.</summary>
+        public string ProductName => _productName;
+
+        /// <summary>アプリのバージョンを指定します.</summary>
+        public string Version => _version;
+
+        /// <summary>バンドルコードを指定します.Androidの場合はVersionCode, iOSの場合はBuildNumberに相当します.この値は、リリース毎に更新する必要があります.</summary>
+        public int VersionCode => _versionCode;
+
+        /// <summary>Build root path.</summary>
+        public string BuildPath => _buildsPath;
+
+        /// <summary>Build directory name.</summary>
+        public string BuildDirectoryName => _buildsDirectoryName;
+
+        /// <summary>Builds file name.</summary>
+        public string BuildName => _buildsName;
+
+        /// <summary>Build AssetBundle.</summary>
+        public bool BuildAssetBundle => _buildAssetBundle;
+
+        /// <summary>Asset Bundles output path.</summary>
+        public string BundleOutputPath
         {
+            get { return Path.Combine("AssetBundles", BuildPathUtils.ConvertBuildTargetToString(ActualBuildTarget)); }
         }
+
+        public IAndroidBuildSettings GetAndroidSettings => _androidSettings;
+        public IiOSBuildSettings GetiOSSettings => _iosSettings;
+        public IWebGLBuildSettings GetWebGLSettings => _webGlSettings;
+
 
         //-------------------------------
         //	Unityコールバック.
         //-------------------------------
-        public virtual void Reset()
+        public virtual void ReadSettings()
         {
-            buildTarget = EditorUserBuildSettings.activeBuildTarget;
-            productName = PlayerSettings.productName;
-            companyName = PlayerSettings.companyName;
+            _buildTarget = EditorUserBuildSettings.activeBuildTarget;
+            _productName = PlayerSettings.productName;
+            _companyName = PlayerSettings.companyName;
 #if UNITY_5_6_OR_NEWER
-            applicationIdentifier = PlayerSettings.GetApplicationIdentifier(buildTargetGroup);
+            _applicationIdentifier = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup);
 #else
             applicationIdentifier = PlayerSettings.bundleIdentifier;
 #endif
-            version = PlayerSettings.bundleVersion;
-            defineSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
+            _version = PlayerSettings.bundleVersion;
+            _defineSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup);
 
             // Build target settings.
-            androidSettings.Reset();
-            iosSettings.Reset();
+            _androidSettings.ReadSettings(this);
+            _iosSettings.ReadSettings(this);
+            _webGlSettings.ReadSettings(this);
         }
 
         //-------------------------------
@@ -217,31 +180,37 @@ namespace Mobcast.Coffee.Build
         /// <summary>
         /// Define script symbol.
         /// </summary>
-        public bool DefineSymbol()
+        public virtual bool DefineSymbol()
         {
-            var oldDefineSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
-            List<string> symbolList = new List<string>(defineSymbols.Split(',', ';', '\n', '\r'));
+            var oldDefineSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup);
+            List<string> symbolList = new List<string>(_defineSymbols.Split(',', ';', '\n', '\r'));
 
             // Symbols specified in command line arguments.
-            if (Util.executeArguments.ContainsKey(Util.OPT_APPEND_SYMBOL))
+            if (ProjectBuilderUtil._executeArguments.ContainsKey(ProjectBuilderUtil.OPT_APPEND_SYMBOL))
             {
-                var argSymbols = Util.executeArguments[Util.OPT_APPEND_SYMBOL].Split(',', ';', '\n', '\r');
+                var argSymbols = ProjectBuilderUtil._executeArguments[ProjectBuilderUtil.OPT_APPEND_SYMBOL]
+                    .Split(',', ';', '\n', '\r');
 
                 // Include symbols.
-                foreach (var s in argSymbols.Where(x => x.IndexOf("!") != 0))
+                foreach (string s in argSymbols.Where(x => x.IndexOf("!") != 0))
+                {
                     symbolList.Add(s);
+                }
 
                 // Exclude symbols start with '!'.
-                foreach (var s in argSymbols.Where(x => x.IndexOf("!") == 0 && symbolList.Contains(x.Substring(1))))
+                foreach (string s in argSymbols.Where(x => x.IndexOf("!") == 0 && symbolList.Contains(x.Substring(1))))
+                {
                     symbolList.Remove(s.Substring(1));
+                }
             }
 
             // Update define script symbol.
             string symbols = symbolList.Count == 0 ? "" : symbolList.Aggregate((a, b) => a + ";" + b);
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, symbols);
-            UnityEngine.Debug.LogFormat("{0}DefineSymbol is updated : {1} -> {2}", kLogType, oldDefineSymbols, symbols);
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup, symbols);
+            UnityEngine.Debug.LogFormat("{0} DefineSymbol is updated : {1} -> {2}", kLogType, oldDefineSymbols,
+                symbols);
 
-            // Any symbol has been chenged?
+            // Any symbol has been changed?
             return oldDefineSymbols != symbols;
         }
 
@@ -255,34 +224,37 @@ namespace Mobcast.Coffee.Build
         {
             //ビルド情報を設定します.
 #if UNITY_5_6_OR_NEWER
-            PlayerSettings.SetApplicationIdentifier(buildTargetGroup, applicationIdentifier);
+            PlayerSettings.SetApplicationIdentifier(BuildTargetGroup, _applicationIdentifier);
 #else
-PlayerSettings.bundleIdentifier = applicationIdentifier;
+            PlayerSettings.bundleIdentifier = applicationIdentifier;
 #endif
-            PlayerSettings.productName = productName;
-            PlayerSettings.companyName = companyName;
+            PlayerSettings.productName = _productName;
+            PlayerSettings.companyName = _companyName;
 
-            EditorUserBuildSettings.development = developmentBuild;
-            EditorUserBuildSettings.allowDebugging = developmentBuild;
+            EditorUserBuildSettings.development = _developmentBuild;
+            EditorUserBuildSettings.allowDebugging = _developmentBuild;
 
             //アプリバージョン.
             //実行引数に開発ビルド番号定義がある場合、ビルド番号を再定義します.
-            PlayerSettings.bundleVersion = version;
+            PlayerSettings.bundleVersion = _version;
             string buildNumber;
-            if (developmentBuild && Util.executeArguments.TryGetValue(Util.OPT_DEV_BUILD_NUM, out buildNumber) &&
+            if (_developmentBuild &&
+                ProjectBuilderUtil._executeArguments.TryGetValue(ProjectBuilderUtil.OPT_DEV_BUILD_NUM,
+                    out buildNumber) &&
                 !string.IsNullOrEmpty(buildNumber))
             {
                 PlayerSettings.bundleVersion += "." + buildNumber;
             }
 
-            File.WriteAllText(Path.Combine(Util.projectDir, "BUILD_VERSION"), PlayerSettings.bundleVersion);
+            File.WriteAllText(Path.Combine(ProjectBuilderUtil.projectDir, "BUILD_VERSION"),
+                PlayerSettings.bundleVersion);
 
             // Scene Settings.
-            EditorBuildSettingsScene[] buildSettingsScenes = EditorBuildSettings.scenes;
+            var buildSettingsScenes = EditorBuildSettings.scenes;
             for (int i = 0; i < buildSettingsScenes.Length; i++)
             {
                 var scene = buildSettingsScenes[i];
-                var setting = scenes.FirstOrDefault(x => x.name == Path.GetFileName(scene.path));
+                var setting = _scenes.FirstOrDefault(x => x.name == Path.GetFileName(scene.path));
                 if (setting != null)
                 {
                     scene.enabled = setting.enable;
@@ -294,11 +266,20 @@ PlayerSettings.bundleIdentifier = applicationIdentifier;
             EditorBuildSettings.scenes = buildSettingsScenes;
 
             // Build target settings.
-            iosSettings.ApplySettings(this);
-            androidSettings.ApplySettings(this);
+            _iosSettings.ApplySettings(this);
+            _androidSettings.ApplySettings(this);
+            _webGlSettings.ApplySettings(this);
 
             OnApplySetting();
             AssetDatabase.SaveAssets();
+        }
+
+        //-------------------------------
+        //	継承関連.
+        //-------------------------------
+        /// <summary>設定適用後コールバック.</summary>
+        protected virtual void OnApplySetting()
+        {
         }
 
         /// <summary>
@@ -310,7 +291,7 @@ PlayerSettings.bundleIdentifier = applicationIdentifier;
             try
             {
                 AssetBundleManifest oldManifest = null;
-                var manifestPath = Path.Combine(bundleOutputPath, actualBuildTarget.ToString());
+                var manifestPath = Path.Combine(BundleOutputPath, ActualBuildTarget.ToString());
                 if (File.Exists(manifestPath))
                 {
                     var manifestAssetBundle = AssetBundle.LoadFromFile(manifestPath);
@@ -321,10 +302,10 @@ PlayerSettings.bundleIdentifier = applicationIdentifier;
 
                 UnityEngine.Debug.Log(kLogType + "BuildAssetBundles is started.");
 
-                Directory.CreateDirectory(bundleOutputPath);
-                BuildAssetBundleOptions opt = (BuildAssetBundleOptions)bundleOptions |
+                Directory.CreateDirectory(BundleOutputPath);
+                var opt = (BuildAssetBundleOptions)_bundleOptions |
                     BuildAssetBundleOptions.DeterministicAssetBundle;
-                var newManifest = BuildPipeline.BuildAssetBundles(bundleOutputPath, opt, actualBuildTarget);
+                var newManifest = BuildPipeline.BuildAssetBundles(BundleOutputPath, opt, ActualBuildTarget);
 
                 var sb = new StringBuilder(kLogType + "AssetBundle report");
                 string[] array;
@@ -338,14 +319,18 @@ PlayerSettings.bundleIdentifier = applicationIdentifier;
                     // 新規
                     array = newBundles.Except(oldBundles).ToArray();
                     sb.AppendFormat("\n[Added]: {0}\n", array.Length);
-                    foreach (var bundleName in array)
+                    foreach (string bundleName in array)
+                    {
                         sb.AppendLine("  > " + bundleName);
+                    }
 
                     // 削除
                     array = oldBundles.Except(newBundles).ToArray();
                     sb.AppendFormat("\n[Deleted]: {0}\n", array.Length);
-                    foreach (var bundleName in array)
+                    foreach (string bundleName in array)
+                    {
                         sb.AppendLine("  > " + bundleName);
+                    }
 
                     // 更新
                     array = oldBundles
@@ -354,30 +339,35 @@ PlayerSettings.bundleIdentifier = applicationIdentifier;
                             newManifest.GetAssetBundleHash(x)))
                         .ToArray();
                     sb.AppendFormat("\n[Updated]: {0}\n", array.Length);
-                    foreach (var bundleName in array)
+                    foreach (string bundleName in array)
+                    {
                         sb.AppendLine("  > " + bundleName);
+                    }
                 }
                 else
                 {
                     // 新規
                     array = newManifest.GetAllAssetBundles();
                     sb.AppendFormat("\n[Added]: {0}\n", array.Length);
-                    foreach (var bundleName in array)
+                    foreach (string bundleName in array)
+                    {
                         sb.AppendLine("  > " + bundleName);
+                    }
                 }
 
                 UnityEngine.Debug.Log(sb);
-
-
-                if (copyToStreamingAssets)
+                
+                if (_copyToStreamingAssets)
                 {
-                    var copyPath = Path.Combine(Application.streamingAssetsPath, bundleOutputPath);
+                    string copyPath = Path.Combine(Application.streamingAssetsPath, BundleOutputPath);
                     Directory.CreateDirectory(copyPath);
 
                     if (Directory.Exists(copyPath))
+                    {
                         FileUtil.DeleteFileOrDirectory(copyPath);
+                    }
 
-                    FileUtil.CopyFileOrDirectory(bundleOutputPath, copyPath);
+                    FileUtil.CopyFileOrDirectory(BundleOutputPath, copyPath);
                 }
 
                 UnityEngine.Debug.Log(kLogType + "BuildAssetBundles is finished successfuly.");
@@ -395,21 +385,20 @@ PlayerSettings.bundleIdentifier = applicationIdentifier;
         /// </summary>
         /// <returns>ビルドに成功していればtrueを、それ以外はfalseを返す.</returns>
         /// <param name="autoRunPlayer">Build & Runモードでビルドします.</param>
-        public bool BuildPlayer(bool autoRunPlayer)
+        public virtual bool BuildPlayer(bool autoRunPlayer)
         {
-            if (buildAssetBundle && !BuildAssetBundles())
+            if (_buildAssetBundle && !BuildAssetBundles())
             {
                 return false;
             }
 
-            if (buildApplication)
+            if (_buildApplication)
             {
                 // Exclude directories.
-                foreach (var dir in excludeDirectories)
-                    Util.ExcludeDirectory(dir);
+                ExcludeBuildDirectoriesUtil.ExcludeDirectories(_excludeDirectories);
 
                 // Build options.
-                BuildOptions opt = developmentBuild
+                BuildOptions opt = _developmentBuild
                     ? (BuildOptions.Development & BuildOptions.AllowDebugging)
                     : BuildOptions.None
                     | (autoRunPlayer ? BuildOptions.AutoRunPlayer : BuildOptions.None);
@@ -419,31 +408,46 @@ PlayerSettings.bundleIdentifier = applicationIdentifier;
                 UnityEngine.Debug.Log(kLogType + "Scenes to build : " +
                     scenesToBuild.Aggregate((a, b) => a + ", " + b));
 
+                string outputFullPath = BuildPathUtils.GetOutputPath(this);
+
+                if (Directory.Exists(outputFullPath))
+                {
+                    Directory.Delete(outputFullPath, true);
+                }
+
+                if (File.Exists(outputFullPath))
+                {
+                    File.Delete(outputFullPath);
+                }
+
                 // Start build.
                 UnityEngine.Debug.Log(kLogType + "BuildPlayer is started. Defined symbols : " +
-                    PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup));
-                var errorMsg = BuildPipeline.BuildPlayer(scenesToBuild, outputFullPath, actualBuildTarget, opt);
+                    PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup));
+                
+                var buildReport = BuildPipeline.BuildPlayer(scenesToBuild, outputFullPath, ActualBuildTarget, opt);
 
                 // Revert excluded directories.
-                Util.RevertExcludedDirectory();
+                ExcludeBuildDirectoriesUtil.RevertExcludedDirectory();
 
-                if (errorMsg.summary.result == BuildResult.Succeeded)
+                if (buildReport.summary.result == BuildResult.Succeeded)
                 {
-                    UnityEngine.Debug.Log(kLogType + "BuildPlayer is finished successfuly.");
+                    UnityEngine.Debug.LogFormat(kLogType + "BuildPlayer is finished successful : {0}", outputFullPath);
 
-                    if (openBuildPathAfterBuild)
+                    if (_openBuildPathAfterBuild)
                     {
-                        Util.RevealOutputInFinder(outputFullPath);
+                        ProjectBuilderUtil.RevealOutputInFinder(outputFullPath);
                     }
                 }
                 else
                 {
-                    UnityEngine.Debug.LogError(kLogType + "BuildPlayer is failed : " + errorMsg);
+                    UnityEngine.Debug.LogErrorFormat(kLogType + "BuildPlayer is failed : {0}", buildReport);
                     return false;
                 }
+
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -451,7 +455,8 @@ PlayerSettings.bundleIdentifier = applicationIdentifier;
         /// </summary>
         protected static void Build()
         {
-            Util.StartBuild(Util.GetBuilderFromExecuteArgument(), false, false);
+            var arguments = ProjectBuilderUtil.GetBuilderFromExecuteArgument();
+            ProjectBuilderUtil.StartBuild(arguments, false, false);
         }
 
 #if UNITY_CLOUD_BUILD
@@ -466,5 +471,21 @@ PlayerSettings.bundleIdentifier = applicationIdentifier;
         }
 
 #endif // UNITY_CLOUD_BUILD
+
+
+        [System.Serializable]
+        public class SceneSetting
+        {
+            public bool enable = true;
+            public string name;
+        }
+
+        [System.Serializable]
+        public enum BundleOptions
+        {
+            LZMA = BuildAssetBundleOptions.None,
+            LZ4 = BuildAssetBundleOptions.ChunkBasedCompression,
+            Uncompressed = BuildAssetBundleOptions.UncompressedAssetBundle,
+        }
     }
 }
