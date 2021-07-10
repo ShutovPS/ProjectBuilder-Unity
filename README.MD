@@ -1,8 +1,5 @@
-ProjectBuilder
+#ProjectBuilder
 
-===
-### v1.1.0
-===
 
 ## Overview
 
@@ -73,7 +70,7 @@ Find the manifest.json file in the Packages folder of your project and add a lin
 
 To update the package, change suffix `#{version}` to the target version.
 
-* `"dev.fd.projectbuilder": "https://github.com/ShutovPS/ProjectBuilder-Unity.git#1.1.0",`
+* `"dev.fd.projectbuilder": "https://github.com/ShutovPS/ProjectBuilder-Unity.git#1.1.2",`
 
 Or, use [UpmGitExtension](https://github.com/mob-sakai/UpmGitExtension) to install and update the package.
 
@@ -142,7 +139,7 @@ public BuildTargetSettings_WebGL webGlSettings = new BuildTargetSettings_WebGL()
 
 ## Release Notes
 
-CHANGELOG (see [CHANGELOG](CHANGELOG.md))
+CHANGELOG (see [CHANGELOG](CHANGELOG.MD))
 
 ## License
 
@@ -150,8 +147,4 @@ MIT License (see [LICENSE](LICENSE))
 
 ## See Also
 
-* GitHub Page : https://github.com/ShutovPS/ProjectBuilder-Unity
-* Issue tracker : https://github.com/ShutovPS/ProjectBuilderr-Unity/issues
-
 * Original GitHub Page : https://github.com/mob-sakai/ProjectBuilder
-* Original Issue tracker : https://github.com/mob-sakai/ProjectBuilder/issues

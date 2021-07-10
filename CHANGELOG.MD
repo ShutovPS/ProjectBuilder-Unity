@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.2]
+
+### Updates
+- Update comments (try to translate to English).
+
+### Fixes
+- Fix hidding of passwords for android's keystore
+
+## [1.1.1]
+
+### Improvements
+- Update code structure.
+- Code refactoring.
+
 ## [1.1.0]
 
 ### Features
