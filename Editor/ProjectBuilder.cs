@@ -25,26 +25,26 @@ namespace Mobcast.Coffee.Build
         [Tooltip("Build Application.")]
         [SerializeField] protected bool _buildApplication = true;
 
-        /// <summary>ビルドターゲットを指定します.</summary>
-        [Tooltip("ビルドターゲットを指定します.")]
+        /// <summary>The currently active build target.</summary>
+        [Tooltip("The currently active build target.")]
         [SerializeField] protected BuildTarget _buildTarget = BuildTarget.NoTarget;
 
 
-        /// <summary>端末に表示されるプロダクト名を指定します.</summary>
-        [Tooltip("端末に表示されるプロダクト名を指定します.")]
+        /// <summary>The name of your product.</summary>
+        [Tooltip("The name of your product.")]
         [SerializeField] protected string _productName = null;
 
-        /// <summary>会社名を指定します.</summary>
-        [Tooltip("会社名を指定します.")]
+        /// <summary>The name of your company.</summary>
+        [Tooltip("The name of your company.")]
         [SerializeField] protected string _companyName = null;
 
 
-        /// <summary>プロダクトのバンドル識別子を指定します.</summary>
-        [Tooltip("プロダクトのバンドル識別子を指定します.")]
+        /// <summary>The application identifier for the specified platform.</summary>
+        [Tooltip("The application identifier for the specified platform.")]
         [SerializeField] protected string _applicationIdentifier = null;
 
 
-        [SerializeField] protected string _buildsPath = "Build";
+        [SerializeField] protected string _buildsPath = "Builds";
         [SerializeField] protected string _buildsDirectoryName = "$PLATFORM";
         [SerializeField] protected string _buildsName = "$IDENTIFIER_$VERSION_$VERSION_CODE_LONG$EXECUTABLE";
 
@@ -53,12 +53,12 @@ namespace Mobcast.Coffee.Build
         //-------------------------------
         //	バージョン設定.
         //-------------------------------
-        /// <summary>アプリのバージョンを指定します.</summary>
-        [Tooltip("アプリのバージョンを指定します.")]
+        /// <summary>Application bundle version shared.</summary>
+        [Tooltip("Application bundle version shared.")]
         [SerializeField] protected string _version = "1.0.0";
 
-        /// <summary>バンドルコードを指定します.Androidの場合はVersionCode, iOSの場合はBuildNumberに相当します.この値は、リリース毎に更新する必要があります.</summary>
-        [Tooltip("整数のバージョンコードを指定します.\nAndroidの場合はVersionCode, iOSの場合はBuildNumberに相当します.\nこの値は、リリース毎に更新する必要があります.")]
+        /// <summary>Application bundle version code for Android and version number for iOS.</summary>
+        [Tooltip("Application bundle version code for Android and version number for iOS.")]
         [SerializeField] protected int _versionCode = 1;
 
         //-------------------------------
@@ -105,7 +105,7 @@ namespace Mobcast.Coffee.Build
         /// <summary>Build Application.</summary>
         public bool BuildApplication => _buildApplication;
 
-        /// <summary>ビルドに利用するターゲット.</summary>
+        /// <summary>The currently active build target.</summary>
         public BuildTarget ActualBuildTarget
         {
             get { return _buildApplication ? _buildTarget : EditorUserBuildSettings.activeBuildTarget; }
@@ -117,16 +117,16 @@ namespace Mobcast.Coffee.Build
             get { return BuildPipeline.GetBuildTargetGroup(ActualBuildTarget); }
         }
 
-        /// <summary>プロダクトのバンドル識別子を指定します.</summary>
+        /// <summary>The application identifier for the specified platform.</summary>
         public string ApplicationIdentifier => _applicationIdentifier;
 
-        /// <summary>端末に表示されるプロダクト名を指定します.</summary>
+        /// <summary>The name of your product.</summary>
         public string ProductName => _productName;
 
-        /// <summary>アプリのバージョンを指定します.</summary>
+        /// <summary>Application bundle version shared.</summary>
         public string Version => _version;
 
-        /// <summary>バンドルコードを指定します.Androidの場合はVersionCode, iOSの場合はBuildNumberに相当します.この値は、リリース毎に更新する必要があります.</summary>
+        /// <summary>Application bundle version code for Android and version number for iOS.</summary>
         public int VersionCode => _versionCode;
 
         /// <summary>Build root path.</summary>

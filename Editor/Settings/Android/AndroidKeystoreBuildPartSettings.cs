@@ -95,7 +95,7 @@ namespace Mobcast.Coffee.Build.Editor
 
                 EditorGUI.EndDisabledGroup();
 
-                _showPasswords = EditorGUILayout.Toggle(new GUIContent("Hide Passwords"), _showPasswords);
+                _showPasswords = EditorGUILayout.Toggle(new GUIContent("Show Passwords"), _showPasswords);
             }
             EditorGUI.indentLevel--;
         }
@@ -109,7 +109,7 @@ namespace Mobcast.Coffee.Build.Editor
                 label = new GUIContent(propertyId);
             }
 
-            if (_showPasswords)
+            if (!_showPasswords)
             {
                 property.stringValue = EditorGUILayout.PasswordField(label, property.stringValue);
             }

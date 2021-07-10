@@ -11,24 +11,24 @@ namespace Mobcast.Coffee.Build
         bool BuildApplication { get; }
         
 
-        /// <summary>ビルドに利用するターゲット.</summary>
+        /// <summary>The currently active build target.</summary>
         BuildTarget ActualBuildTarget { get; }
 
         /// <summary>Build target group for this builder asset.</summary>
         BuildTargetGroup BuildTargetGroup { get; }
         
         
-        /// <summary>プロダクトのバンドル識別子を指定します.</summary>
+        /// <summary>The application identifier for the specified platform.</summary>
         string ApplicationIdentifier { get; }
 
-        /// <summary>端末に表示されるプロダクト名を指定します.</summary>
+        /// <summary>The name of your product.</summary>
         string ProductName { get; }
         
         
-        /// <summary>アプリのバージョンを指定します.</summary>
+        /// <summary>Application bundle version shared.</summary>
         string Version { get; }
 
-        /// <summary>バンドルコードを指定します.Androidの場合はVersionCode, iOSの場合はBuildNumberに相当します.この値は、リリース毎に更新する必要があります.</summary>
+        /// <summary>Application bundle version code for Android and version number for iOS.</summary>
         int VersionCode { get; }
         
 
